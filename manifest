@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 0.1
+apiversion: 2
+description: My module
+author: Your Name
+license: Specify your license
+copyright: Copyright (c) 2013 by Your Company
+
+
+# these should not be edited
+name: rebtel-sdk
+moduleid: com.rebtel.sdk
+guid: cff1b70a-3936-48d7-944b-5f44f08380bf
+platform: iphone
+minsdk: 3.1.0.GA
