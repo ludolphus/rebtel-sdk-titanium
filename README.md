@@ -19,7 +19,7 @@ As part of the build process, it will automatically download the
 Rebtel SDK package and place the iOS Framework in vendor/RebtelSDK,
 and lib/libRebtelSDK.a. The reason a copy of the library which usually
 resides within the .framework bundle is copied to lib/libRebtelSDK.a
-is because it needs to be statically linked in to the titanium module
+is because it needs to be statically linked in to the Titanium module
 itself, thus required to be a static library and not specified as a
 linked framework.
 
@@ -100,10 +100,10 @@ _client_ maps to [REBClient](http://developer.rebtel.com/docs/ios/referenceguide
 
 These events map to [REBClientDelegate](http://developer.rebtel.com/docs/ios/referenceguide/Protocols/REBClientDelegate.html).
 
-`didReceiveIncomingCall`, on which a property `call` is available on the event object.
+`didReceiveIncomingCall`, on which a property `call` is available on the event object.  
 `clientDidStart`  
 `clientDidStop`  
-`clientDidFail`, on which a property `error` is available on the event object.
+`clientDidFail`, on which a property `error` is available on the event object.  
 `onLog`
 
 
@@ -139,6 +139,6 @@ any form, including sending a pull request via Github, a code fragment
 or patch via private email or public discussion groups, you agree to
 release your code under the terms of the BSD license that you can find
 in the LICENCE file that can be found in the root of this repository
-(https://github.com/cahlbin/rebtel-sdk-titanium")
+(https://github.com/cahlbin/rebtel-sdk-titanium)
 
 
