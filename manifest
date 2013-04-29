@@ -4,11 +4,14 @@
 #
 version: 0.1
 apiversion: 2
-description: My module
-author: Your Name
-license: Specify your license
-copyright: Copyright (c) 2013 by Your Company
+description: Rebtel SDK for Titanium
+author: Christoffer Ahlbin
+license: The BSD 3-Clause ("New BSD")
+copyright: Copyright (c) 2013 by Rebtel Networks AB
 
+# Rebtel SDK specifics
+# rebtel_sdk_download_url is used by build.py
+rebtel_sdk_download_url: https://sdksandbox.rebtel.com/rebtelsdk-1.0.0-212dace.tar.bz2
 
 # these should not be edited
 name: rebtel-sdk

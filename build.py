@@ -4,12 +4,13 @@
 #
 #
 import os, subprocess, sys, glob, string
-import zipfile
+import zipfile, shutil
 from datetime import date
+import prepare_rebtel_sdk
 
 cwd = os.path.abspath(os.path.dirname(sys._getframe(0).f_code.co_filename))
 os.chdir(cwd)
-required_module_keys = ['name','version','moduleid','description','copyright','license','copyright','platform','minsdk']
+required_module_keys = ['name','version','moduleid','description','copyright','license','copyright','platform','minsdk', 'rebtel_sdk_download_url']
 module_defaults = {
 	'description':'My module',
 	'author': 'Your Name',
@@ -48,23 +49,16 @@ def read_ti_xcconfig():
 	return config
 
 def generate_doc(config):
-	docdir = os.path.join(cwd,'documentation')
-	if not os.path.exists(docdir):
-		print "Couldn't find documentation file at: %s" % docdir
-		return None
-
 	try:
 		import markdown2 as markdown
 	except ImportError:
 		import markdown
-	documentation = []
-	for file in os.listdir(docdir):
-		if file in ignoreFiles or os.path.isdir(os.path.join(docdir, file)):
-			continue
-		md = open(os.path.join(docdir,file)).read()
-		html = markdown.markdown(md)
-		documentation.append({file:html});
-	return documentation
+
+        # use the README as doc generation input,
+
+        file_path = os.path.join(cwd, "README")
+        html = markdown.markdown(open(file_path).read())
+	return [{"index.html": html}]
 
 def compile_js(manifest,config):
 	js_file = os.path.join(cwd,'assets','com.rebtel.sdk.js')
@@ -127,7 +121,7 @@ def validate_manifest():
 		line = line.strip()
 		if line[0:1]=='#': continue
 		if line.find(':') < 0: continue
-		key,value = line.split(':')
+		key,value = line.split(':', 1)
 		manifest[key.strip()]=value.strip()
 	for key in required_module_keys:
 		if not manifest.has_key(key): die("missing required manifest key '%s'" % key)
@@ -212,10 +206,12 @@ if __name__ == '__main__':
 	validate_license()
 	config = read_ti_xcconfig()
 
+        prepare_rebtel_sdk.prepare(manifest['rebtel_sdk_download_url'])
+
 	sdk = find_sdk(config)
 	sys.path.insert(0,os.path.join(sdk,'iphone'))
 	sys.path.append(os.path.join(sdk, "common"))
-
+        
 	compile_js(manifest,config)
 	build_module(manifest,config)
 	package_module(manifest,mf,config)

@@ -2,3 +2,10 @@ tmp
 bin
 build
 *.zip
+README.html
+
+rebtel-sdk.xcodeproj/project.xcworkspace
+vendor/RebtelSDK*tar.bz2
+vendor/RebtelSDK
+lib/libRebtelSDK.a
+

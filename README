@@ -1,151 +1,144 @@
-Appcelerator Titanium iPhone Module Project
-===========================================
+# Appcelerator Titanium native module for Rebtel SDK
 
-This is a skeleton Titanium Mobile iPhone module project.  Modules can be 
-used to extend the functionality of Titanium by providing additional native
-code that is compiled into your application at build time and can expose certain
-APIs into JavaScript. 
+A Titanium module for the Rebtel iOS SDK, which lets you integrate
+voice calling (VoIP) functionality in your application.
 
-MODULE NAMING
---------------
+See [developer.rebtel.com](http://developer.rebtel.com) for more
+information about the Rebtel SDK and detailed documentation of its
+functionality.
 
-Choose a unique module id for your module.  This ID usually follows a namespace
-convention using DNS notation.  For example, com.appcelerator.module.test.  This
-ID can only be used once by all public modules in Titanium.
+# IMPORTANT
 
+Note that this titanium module is still at a pre-1.0 state, and neither a part of the official Rebtel SDK. The javascript bindings are not covering 100% of the native iOS SDK, and there may be issues and bugs.
 
-COMPONENTS
------------
+# Building the module
 
-Components that are exposed by your module must follow a special naming convention.
-A component (widget, proxy, etc) must be named with the pattern:
+Simply run `./build.py`.
 
-	Ti<ModuleName><ComponentName>Proxy
+As part of the build process, it will automatically download the
+Rebtel SDK package and place the iOS Framework in vendor/RebtelSDK,
+and lib/libRebtelSDK.a. The reason a copy of the library which usually
+resides within the .framework bundle is copied to lib/libRebtelSDK.a
+is because it needs to be statically linked in to the titanium module
+itself, thus required to be a static library and not specified as a
+linked framework.
 
-For example, if you component was called Foo, your proxy would be named:
+Once the Rebtel SDK framework/library is in place, the complete
+Titanium module will be built and packaged as
+com.rebtel.sdk-iphone-[VERSION].zip.
 
-	TiMyfirstFooProxy
-	
-For view proxies or widgets, you must create both a view proxy and a view implementation. 
-If you widget was named proxy, you would create the following files:
+# Usage
 
-	TiMyfirstFooProxy.h
-	TiMyfirstFooProxy.m
-	TiMyfirstFoo.h
-	TiMyfirstFoo.m
-	
-The view implementation is named the same except it does contain the suffix `Proxy`.  
+Get your Application Key and Application Secret at [developer.rebtel.com](http://developer.rebtel.com).
 
-View implementations extend the Titanium base class `TiUIView`.  View Proxies extend the
-Titanium base class `TiUIViewProxy` or `TiUIWidgetProxy`.  
+## Starting the Rebtel client
 
-For proxies that are simply native objects that can be returned to JavaScript, you can 
-simply extend `TiProxy` and no view implementation is required.
+    var rebtel_sdk = require('com.rebtel.sdk');
+    
+    var client = rebtel_sdk.createClient({
+        applicationKey: "<APPLICATION KEY>",
+        applicationSecret: "<APPLICATION SECRET>",
+        environmentHost: "sdksandbox.rebtel.com",
+        userId: "johndoe"
+    });
+    
+    client.start();
+    client.startListeningOnActiveConnection(); 
+    
 
+## Place outgoing call
+    
+    var call = client.call("janedoe")
 
-GET STARTED
-------------
+## Receive incoming calls
 
-1. Edit manifest with the appropriate details about your module.
-2. Edit LICENSE to add your license details.
-3. Place any assets (such as PNG files) that are required in the assets folder.
-4. Edit the titanium.xcconfig and make sure you're building for the right Titanium version.
-5. Code and build.
+    client.addEventListener('didReceiveIncomingCall',function(event){
+        var dialog = Ti.UI.createAlertDialog({
+            message: "Incoming call from  " + event.call.remoteUserId,
+            ok: 'answer',
+            title: 'Incoming Rebtel Call'
+        });
+        
+        dialog.addEventListener('click', function(e){
+            event.call.answer()
+        });
+   
+        dialog.show();
+    });
 
-BUILD TIME COMPILER CONFIG
---------------------------
+# Using iOS background modes
 
-You can edit the file `module.xcconfig` to include any build time settings that should be
-set during application compilation that your module requires.  This file will automatically get `#include` in the main application project.  
+The Rebtel SDK requires you to use the _UIBackgroundModes_ `audio` and `voip`. 
 
-For more information about this file, please see the Apple documentation at:
+Update your `ti.app` as follows:
 
-<http://developer.apple.com/mac/library/documentation/DeveloperTools/Conceptual/XcodeBuildSystem/400-Build_Configurations/build_configs.html>
+    <iphone>
+        <backgroundModes>
+          <mode>voip</mode>
+          <mode>audio</mode>
+        </backgroundModes>          
+    </iphone>
+    
+    
+# Rebtel Titanium Module API
 
+## com.rebtel.sdk (the module interface)
 
-DOCUMENTATION FOR YOUR MODULE
------------------------------
+The module entry point maps to [RebtelSDK](http://developer.rebtel.com/docs/ios/referenceguide/Classes/RebtelSDK.html).
 
-You should provide at least minimal documentation for your module in `documentation` folder using the Markdown syntax.
+`createClient`
 
-For more information on the Markdown syntax, refer to this documentation at:
+## com.rebtel.sdk.client
 
-<http://daringfireball.net/projects/markdown/>
+_client_ maps to [REBClient](http://developer.rebtel.com/docs/ios/referenceguide/Protocols/REBClient.html).
 
+### Methods
 
-TEST HARNESS EXAMPLE FOR YOUR MODULE
-------------------------------------
+`call(userId:string)`
 
-The `example` directory contains a skeleton application test harness that can be 
-used for testing and providing an example of usage to the users of your module.
+### Events:
 
+These events map to [REBClientDelegate](http://developer.rebtel.com/docs/ios/referenceguide/Protocols/REBClientDelegate.html).
 
-INSTALL YOUR MODULE
---------------------
-
-1. Run `build.py` which creates your distribution
-2. cd to `/Library/Application Support/Titanium`
-3. copy this zip file into the folder of your Titanium SDK
-
-REGISTER YOUR MODULE
----------------------
-
-Register your module with your application by editing `tiapp.xml` and adding your module.
-Example:
-
-<modules>
-	<module version="0.1">com.rebtel.sdk</module>
-</modules>
-
-When you run your project, the compiler will know automatically compile in your module
-dependencies and copy appropriate image assets into the application.
-
-USING YOUR MODULE IN CODE
--------------------------
-
-To use your module in code, you will need to require it. 
-
-For example,
-
-	var my_module = require('com.rebtel.sdk');
-	my_module.foo();
-
-WRITING PURE JS NATIVE MODULES
-------------------------------
-
-You can write a pure JavaScript "natively compiled" module.  This is nice if you
-want to distribute a JS module pre-compiled.
-
-To create a module, create a file named com.rebtel.sdk.js under the assets folder.
-This file must be in the Common JS format.  For example:
-
-	exports.echo = function(s)
-	{
-		return s;
-	};
-	
-Any functions and properties that are exported will be made available as part of your
-module.  All other code inside your JS will be private to your module.
-
-For pure JS module, you don't need to modify any of the Objective-C module code. You
-can leave it as-is and build.
-
-TESTING YOUR MODULE
--------------------
-
-Run the `titanium.py` script to test your module or test from within XCode.
-To test with the script, execute:
-
-	titanium run --dir=YOURMODULEDIR
-	
-
-This will execute the app.js in the example folder as a Titanium application.
+`didReceiveIncomingCall`, on which a property `call` is available on the event object.
+`clientDidStart`  
+`clientDidStop`  
+`clientDidFail`, on which a property `error` is available on the event object.
+`onLog`
 
 
-DISTRIBUTING YOUR MODULE
--------------------------
+## com.rebtel.sdk.call
 
-Currently, you will need to manually distribution your module distribution zip file directly. However, in the near future, we will make module distribution and sharing built-in to Titanium Developer and in the Titanium Marketplace!
+_call_ maps to [REBCall](http://developer.rebtel.com/docs/ios/referenceguide/Protocols/REBCall.html)
+
+### Methods
+
+`answer`  
+`hangup`
+
+### Properties:
+
+`remoteUserId:string`  
+`direction:int`  
+`state:int`  
+
+### Events:
+
+These events map to [REBCallDelegate](http://developer.rebtel.com/docs/ios/referenceguide/Protocols/REBCallDelegate.html).
+
+`callReceivedOnRemoteEnd`  
+`callAnswered`  
+`callEstablished`  
+`callEnded`
 
 
-Cheers!
+# Contributing
+
+By contributing code to the the Rebtel SDK Titanium module project in
+any form, including sending a pull request via Github, a code fragment
+or patch via private email or public discussion groups, you agree to
+release your code under the terms of the BSD license that you can find
+in the LICENCE file that can be found in the root of this repository
+(https://github.com/cahlbin/rebtel-sdk-titanium")
+
+

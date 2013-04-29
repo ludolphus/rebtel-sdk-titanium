@@ -25,3 +25,8 @@
 //
 // IMPORTANT NOTE: always use $(inherited) in your overrides
 // 
+
+OTHER_LDFLAGS=$(inherited) -framework AudioToolbox -framework AVFoundation -framework Security
+
+CLANG_ENABLE_OBJC_ARC = YES
+
