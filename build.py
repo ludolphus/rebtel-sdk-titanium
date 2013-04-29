@@ -56,7 +56,7 @@ def generate_doc(config):
 
         # use the README as doc generation input,
 
-        file_path = os.path.join(cwd, "README")
+        file_path = os.path.join(cwd, "README.md")
         html = markdown.markdown(open(file_path).read())
 	return [{"index.html": html}]
 
